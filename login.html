@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KONIC AI - Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkNavy: '#0B0F19',
+                        cardNavy: '#111827',
+                        techBlue: '#2563EB',
+                        electricCyan: '#06B6D4'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkNavy text-gray-100 min-h-screen flex items-center justify-center font-sans px-4">
+
+    <div class="max-w-md w-full bg-cardNavy border border-gray-800 rounded-2xl p-8 shadow-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold tracking-wider text-electricCyan">KONIC AI</h1>
+            <p class="text-gray-400 text-sm mt-2" id="form-subtitle">Sign in to your intelligent workspace</p>
+        </div>
+
+        <!-- Auth Form -->
+        <form id="auth-form" class="space-y-4">
+            <div id="name-field-container" class="hidden">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                <input type="text" id="full-name" class="w-full bg-darkNavy border border-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-techBlue" placeholder="Ibrahim Kabia">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                <input type="email" id="email" required class="w-full bg-darkNavy border border-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-techBlue" placeholder="you@example.com">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <input type="password" id="password" required class="w-full bg-darkNavy border border-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-techBlue" placeholder="••••••••">
+            </div>
+
+            <button type="submit" id="submit-btn" class="w-full bg-techBlue hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-techBlue/30">Sign In</button>
+        </form>
+
+        <!-- Toggle Mode -->
+        <div class="mt-6 text-center text-sm">
+            <p class="text-gray-400">
+                <span id="toggle-text">Don't have an account?</span> 
+                <button id="toggle-mode-btn" class="text-electricCyan font-medium hover:underline ml-1">Create Account</button>
+            </p>
+        </div>
+
+        <div id="error-message" class="mt-4 p-3 bg-red-900/50 border border-red-700 text-red-200 text-sm rounded-lg hidden"></div>
+    </div>
+
+    <!-- Auth Logic Script -->
+    <script type="module">
+        import { auth, db } from "../config/firebase-init.js";
+        import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        let isSignUp = false;
+        const form = document.getElementById("auth-form");
+        const subtitle = document.getElementById("form-subtitle");
+        const nameContainer = document.getElementById("name-field-container");
+        const submitBtn = document.getElementById("submit-btn");
+        const toggleBtn = document.getElementById("toggle-mode-btn");
+        const toggleText = document.getElementById("toggle-text");
+        const errorDiv = document.getElementById("error-message");
+
+        toggleBtn.addEventListener("click", () => {
+            isSignUp = !isSignUp;
+            if (isSignUp) {
+                subtitle.textContent = "Create your new account";
+                nameContainer.classList.remove("hidden");
+                submitBtn.textContent = "Create Account";
+                toggleText.textContent = "Already have an account?";
+                toggleBtn.textContent = "Sign In";
+            } else {
+                subtitle.textContent = "Sign in to your intelligent workspace";
+                nameContainer.classList.add("hidden");
+                submitBtn.textContent = "Sign In";
+                toggleText.textContent = "Don't have an account?";
+                toggleBtn.textContent = "Create Account";
+            }
+            errorDiv.classList.add("hidden");
+        });
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errorDiv.classList.add("hidden");
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const fullName = document.getElementById("full-name").value.trim();
+
+            try {
+                if (isSignUp) {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // Store user profile in Firestore with default role 'user' (master admin assigned manually or verified by email)
+                    const role = (email === "Kabiaprincesj3@gmail.com") ? "admin" : "user";
+
+                    await setDoc(doc(db, "users", user.uid), {
+                        fullName: fullName || "User",
+                        email: email,
+                        role: role,
+                        plan: "free",
+                        createdAt: new Date().toISOString()
+                    });
+
+                    window.location.href = role === "admin" ? "../admin/index.html" : "dashboard.html";
+                } else {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // Fetch user role for proper redirection
+                    const userSnap = await getDoc(doc(db, "users", user.uid));
+                    const userData = userSnap.exists() ? userSnap.data() : {};
+
+                    if (userData.role === "admin" || email === "Kabiaprincesj3@gmail.com") {
+                        window.location.href = "../admin/index.html";
+                    } else {
+                        window.location.href = "dashboard.html";
+                    }
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove("hidden");
+            }
+        });
+    </script>
+</body>
+</html>
