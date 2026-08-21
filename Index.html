@@ -1,0 +1,54 @@
+DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KONIC AI - Advanced Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkNavy: '#0B0F19',
+                        cardNavy: '#111827',
+                        techBlue: '#2563EB',
+                        electricCyan: '#06B6D4'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkNavy text-gray-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Navbar -->
+    <header class="border-b border-gray-800 bg-cardNavy/50 backdrop-blur sticky top-0 z-50 px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <span class="text-xl font-bold tracking-wider text-electricCyan">KONIC AI</span>
+        </div>
+        <div class="space-x-4">
+            <a href="login.html" class="text-gray-300 hover:text-white px-4 py-2 font-medium">Login</a>
+            <a href="login.html" class="bg-techBlue hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition">Get Started</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
+        <div class="max-w-3xl">
+            <span class="text-xs uppercase tracking-widest bg-techBlue/20 text-electricCyan px-3 py-1 rounded-full border border-techBlue/30">Next-Gen Ecosystem</span>
+            <h1 class="text-5xl md:text-6xl font-extrabold mt-6 tracking-tight">The Future of Intelligent <span class="text-electricCyan">Workflows</span></h1>
+            <p class="mt-6 text-lg text-gray-400">Experience advanced multi-model AI chats, real-time code generation, secure cloud file management, and robust digital toolsets.</p>
+            <div class="mt-10 flex justify-center space-x-4">
+                <a href="login.html" class="bg-techBlue hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-techBlue/30 transition">Launch Platform</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 py-6 text-center text-gray-500 text-sm">
+        &copy; 2026 KONIC AI TECH LTD. All rights reserved.
+    </footer>
+</body>
+</html>
